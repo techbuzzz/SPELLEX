@@ -4,11 +4,11 @@ namespace SPEllex.Words.NumberToWords
 {
     internal class German : INumberToWords
     {
-        private static readonly string[] _digits;
-        private static readonly Dictionary<int, string[]> _exponent;
-        private static readonly string _minus = "Minus";
-        private static readonly string _sep;
-        private static readonly string _sep2;
+        private const string Minus = "Minus";
+        private static readonly string[] Digits;
+        private static readonly Dictionary<int, string[]> Exponent;
+        private static readonly string Sep;
+        private static readonly string Sep2;
 
         static German()
         {
@@ -38,10 +38,10 @@ namespace SPEllex.Words.NumberToWords
                 {0x3f, new[] {"Dezilliarde", "Dezilliarden"}},
                 {120, new[] {"Vigintillion", "Vigintillionen"}}
             };
-            _exponent = dictionary;
-            _digits = new[] {"null", "ein", "zwei", "drei", "vier", "f\x00fcnf", "sechs", "sieben", "acht", "neun"};
-            _sep = "";
-            _sep2 = " ";
+            Exponent = dictionary;
+            Digits = new[] {"null", "ein", "zwei", "drei", "vier", "f\x00fcnf", "sechs", "sieben", "acht", "neun"};
+            Sep = "";
+            Sep2 = " ";
         }
 
         public string ToWords(string num)
@@ -55,7 +55,7 @@ namespace SPEllex.Words.NumberToWords
             num = num.Trim();
             if (num[0] == '-')
             {
-                str = _sep + _minus;
+                str = Sep + Minus;
                 num = num.Substring(1);
             }
             num = num.TrimStart(new[] {'0'});
@@ -65,15 +65,15 @@ namespace SPEllex.Words.NumberToWords
                 int num3 = num2;
                 for (int i = num2; i > 0; i--)
                 {
-                    if (_exponent.ContainsKey(i))
+                    if (Exponent.ContainsKey(i))
                     {
                         string str2 = num.Substring(num2 - num3, (num3 - i) + 1).TrimStart(new[] {'0'});
                         if (!string.IsNullOrEmpty(str2))
                         {
-                            string str3 = _exponent[power][1];
+                            string str3 = Exponent[power][1];
                             if (!string.IsNullOrEmpty(powsuffix))
                             {
-                                str3 = str3 + _sep + powsuffix;
+                                str3 = str3 + Sep + powsuffix;
                             }
                             str = str + ToWords(str2, i, str3);
                         }
@@ -88,7 +88,7 @@ namespace SPEllex.Words.NumberToWords
             }
             else if (string.IsNullOrEmpty(num))
             {
-                return (_sep + _digits[0]);
+                return (Sep + Digits[0]);
             }
             int index = 0;
             int num6 = 0;
@@ -118,17 +118,17 @@ namespace SPEllex.Words.NumberToWords
             if (index != 0)
             {
                 string str4 = str;
-                str = str4 + _sep + _digits[index] + _sep + "hundert";
+                str = str4 + Sep + Digits[index] + Sep + "hundert";
             }
             if ((num6 != 1) && (num7 > 0))
             {
                 if (num6 > 0)
                 {
-                    str = str + _digits[num7] + "und";
+                    str = str + Digits[num7] + "und";
                 }
                 else
                 {
-                    str = str + _digits[num7];
+                    str = str + Digits[num7];
                     if (num7 == 1)
                     {
                         if (power == 0)
@@ -148,15 +148,15 @@ namespace SPEllex.Words.NumberToWords
                     switch (num7)
                     {
                         case 0:
-                            str = str + _sep + "zehn";
+                            str = str + Sep + "zehn";
                             break;
 
                         case 1:
-                            str = str + _sep + "elf";
+                            str = str + Sep + "elf";
                             break;
 
                         case 2:
-                            str = str + _sep + "zw\x00f6lf";
+                            str = str + Sep + "zw\x00f6lf";
                             break;
 
                         case 3:
@@ -164,68 +164,68 @@ namespace SPEllex.Words.NumberToWords
                         case 5:
                         case 8:
                         case 9:
-                            str = str + _sep + _digits[num7] + "zehn";
+                            str = str + Sep + Digits[num7] + "zehn";
                             break;
 
                         case 6:
-                            str = str + _sep + "sechzehn";
+                            str = str + Sep + "sechzehn";
                             break;
 
                         case 7:
-                            str = str + _sep + "siebzehn";
+                            str = str + Sep + "siebzehn";
                             break;
                     }
                     break;
 
                 case 2:
-                    str = str + _sep + "zwanzig";
+                    str = str + Sep + "zwanzig";
                     break;
 
                 case 3:
-                    str = str + _sep + "drei\x00dfig";
+                    str = str + Sep + "drei\x00dfig";
                     break;
 
                 case 4:
-                    str = str + _sep + "vierzig";
+                    str = str + Sep + "vierzig";
                     break;
 
                 case 5:
                 case 8:
                 case 9:
-                    str = str + _sep + _digits[num6] + "zig";
+                    str = str + Sep + Digits[num6] + "zig";
                     break;
 
                 case 6:
-                    str = str + _sep + "sechzig";
+                    str = str + Sep + "sechzig";
                     break;
 
                 case 7:
-                    str = str + _sep + "siebzig";
+                    str = str + Sep + "siebzig";
                     break;
             }
             if (power > 0)
             {
                 string[] strArray = null;
-                if (!_exponent.TryGetValue(power, out strArray))
+                if (!Exponent.TryGetValue(power, out strArray))
                 {
                     return null;
                 }
                 if (power == 3)
                 {
-                    str = str + _sep + strArray[0];
+                    str = str + Sep + strArray[0];
                 }
                 else if ((num7 == 1) && ((num6 + index) == 0))
                 {
-                    str = str + _sep2 + strArray[0] + _sep2;
+                    str = str + Sep2 + strArray[0] + Sep2;
                 }
                 else
                 {
-                    str = str + _sep2 + strArray[1] + _sep2;
+                    str = str + Sep2 + strArray[1] + Sep2;
                 }
             }
             if (!string.IsNullOrEmpty(powsuffix))
             {
-                str = str + _sep + powsuffix;
+                str = str + Sep + powsuffix;
             }
             return str;
         }

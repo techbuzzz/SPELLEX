@@ -4,16 +4,15 @@ namespace SPEllex.Words.NumberToWords
 {
     internal class French : INumberToWords
     {
-        private static readonly string _and = "et";
-        private static readonly string _dash = "-";
-        private static readonly string[] _digits;
-        private static readonly Dictionary<int, string> _exponent;
-        private static readonly string _infinity = "infini";
-        private static readonly string _minus = "moins";
-        private static readonly Dictionary<int, string> _miscNumbers;
-        private static readonly string _plural = "s";
-        private static readonly string _sep = " ";
-        private static readonly string _zero = "z\x00e9ro";
+        private const string And = "et";
+        private const string Dash = "-";
+        private const string Minus = "moins";
+        private const string Plural = "s";
+        private const string Sep = " ";
+        private const string Zero = "z\x00e9ro";
+        private static readonly string[] Digits;
+        private static readonly Dictionary<int, string> Exponent;
+        private static readonly Dictionary<int, string> MiscNumbers;
 
         static French()
         {
@@ -33,8 +32,8 @@ namespace SPEllex.Words.NumberToWords
                 {60, "soixante"},
                 {100, "cent"}
             };
-            _miscNumbers = dictionary;
-            _digits = new[] {"", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"};
+            MiscNumbers = dictionary;
+            Digits = new[] {"", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"};
             var dictionary2 = new Dictionary<int, string>
             {
                 {0, ""},
@@ -72,24 +71,24 @@ namespace SPEllex.Words.NumberToWords
                 {0x60, "untrigintillion"},
                 {0x63, "duotrigintillion"}
             };
-            _exponent = dictionary2;
+            Exponent = dictionary2;
         }
 
         public string ToWords(string num)
         {
             if (string.IsNullOrEmpty(num))
             {
-                return _zero;
+                return Zero;
             }
             num = num.Trim();
             if (int.Parse(num) == 0)
             {
-                return _zero;
+                return Zero;
             }
             string str = "";
             if (num[0] == '-')
             {
-                str = _minus + _sep;
+                str = Minus + Sep;
                 num = num.Substring(1);
             }
             num = num.TrimStart(new[] {'0'});
@@ -103,17 +102,17 @@ namespace SPEllex.Words.NumberToWords
                 {
                     if ((num4 != 1) || (num3 != 2))
                     {
-                        str = str + showDigitsGroup(num4, (i + 1) == strArray.Length) + _sep;
+                        str = str + showDigitsGroup(num4, (i + 1) == strArray.Length) + Sep;
                     }
-                    str = str + _exponent[(num3 - 1)*3];
+                    str = str + Exponent[(num3 - 1)*3];
                     if ((num3 > 2) && (num4 > 1))
                     {
-                        str = str + _plural;
+                        str = str + Plural;
                     }
-                    str = str + _sep;
+                    str = str + Sep;
                 }
             }
-            return str.TrimEnd(_sep.ToCharArray());
+            return str.TrimEnd(Sep.ToCharArray());
         }
 
         private string showDigitsGroup(int num, bool isLast = false)
@@ -126,17 +125,17 @@ namespace SPEllex.Words.NumberToWords
             {
                 if (num4 > 1)
                 {
-                    str = str + _digits[num4] + _sep + _miscNumbers[100];
+                    str = str + Digits[num4] + Sep + MiscNumbers[100];
                     if ((isLast && (index == 0)) && (num3 == 0))
                     {
-                        str = str + _plural;
+                        str = str + Plural;
                     }
                 }
                 else
                 {
-                    str = str + _miscNumbers[100];
+                    str = str + MiscNumbers[100];
                 }
-                str = str + _sep;
+                str = str + Sep;
             }
             if (num3 != 0)
             {
@@ -144,11 +143,11 @@ namespace SPEllex.Words.NumberToWords
                 {
                     if (index <= 6)
                     {
-                        str = str + _miscNumbers[10 + index];
+                        str = str + MiscNumbers[10 + index];
                     }
                     else
                     {
-                        str = str + _miscNumbers[10] + "-" + _digits[index];
+                        str = str + MiscNumbers[10] + "-" + Digits[index];
                     }
                     index = 0;
                 }
@@ -156,15 +155,15 @@ namespace SPEllex.Words.NumberToWords
                 {
                     if (num3 < 8)
                     {
-                        str = str + _miscNumbers[60];
+                        str = str + MiscNumbers[60];
                         int num5 = ((num3*10) + index) - 60;
                         if (index == 1)
                         {
-                            str = str + _sep + _and + _sep;
+                            str = str + Sep + And + Sep;
                         }
                         else if (num5 != 0)
                         {
-                            str = str + _dash;
+                            str = str + Dash;
                         }
                         if (num5 != 0)
                         {
@@ -174,22 +173,22 @@ namespace SPEllex.Words.NumberToWords
                     }
                     else
                     {
-                        str = str + _digits[4] + _dash + _miscNumbers[20];
+                        str = str + Digits[4] + Dash + MiscNumbers[20];
                         int num6 = ((num3*10) + index) - 80;
                         if (num6 != 0)
                         {
-                            str = str + _dash + showDigitsGroup(num6, false);
+                            str = str + Dash + showDigitsGroup(num6, false);
                             index = 0;
                         }
                         else
                         {
-                            str = str + _plural;
+                            str = str + Plural;
                         }
                     }
                 }
                 else
                 {
-                    str = str + _miscNumbers[num3*10];
+                    str = str + MiscNumbers[num3*10];
                 }
             }
             if (index != 0)
@@ -198,16 +197,16 @@ namespace SPEllex.Words.NumberToWords
                 {
                     if (index == 1)
                     {
-                        str = str + _sep + _and + _sep;
+                        str = str + Sep + And + Sep;
                     }
                     else
                     {
-                        str = str + _dash;
+                        str = str + Dash;
                     }
                 }
-                str = str + _digits[index];
+                str = str + Digits[index];
             }
-            return str.TrimEnd(_sep.ToCharArray());
+            return str.TrimEnd(Sep.ToCharArray());
         }
 
         private string[] splitNumber(string num)

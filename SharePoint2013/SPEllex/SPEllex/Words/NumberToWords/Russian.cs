@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace SPEllex.Words.NumberToWords
 {
     internal class Russian : INumberToWords
     {
-        private static readonly string[,] _digits;
-        private static readonly Dictionary<int, string> _exponent;
-        private static readonly Dictionary<int, string> _hundreds;
-        private static readonly string _minus;
-        private static readonly string _sep;
-        private static readonly Dictionary<int, string> _teens;
-        private static readonly Dictionary<int, string> _tens;
+        private static readonly string[,] Digits;
+        private static readonly Dictionary<int, string> Exponent;
+        private static readonly Dictionary<int, string> Hundreds;
+        private static readonly string Minus;
+        private static readonly string Sep;
+        private static readonly Dictionary<int, string> Teens;
+        private static readonly Dictionary<int, string> Tens;
 
         static Russian()
         {
@@ -52,7 +53,7 @@ namespace SPEllex.Words.NumberToWords
                 {0x60, "унтригинтиллион"},
                 {0x63, "дуотригинтиллион"}
             };
-            _exponent = dictionary;
+            Exponent = dictionary;
             var dictionary2 = new Dictionary<int, string>
             {
                 {11, "одиннадцать"},
@@ -65,7 +66,7 @@ namespace SPEllex.Words.NumberToWords
                 {0x12, "восемнадцать"},
                 {0x13, "девятнадцать"}
             };
-            _teens = dictionary2;
+            Teens = dictionary2;
             var dictionary3 = new Dictionary<int, string>
             {
                 {2, "двадцать"},
@@ -77,7 +78,7 @@ namespace SPEllex.Words.NumberToWords
                 {8, "восемьдесят"},
                 {9, "девяносто"}
             };
-            _tens = dictionary3;
+            Tens = dictionary3;
             var dictionary4 = new Dictionary<int, string>
             {
                 {1, "сто"},
@@ -90,10 +91,10 @@ namespace SPEllex.Words.NumberToWords
                 {8, "восемьсот"},
                 {9, "девятьсот"}
             };
-            _hundreds = dictionary4;
-            _minus = "минус";
-            _sep = " ";
-            _digits = new[,]
+            Hundreds = dictionary4;
+            Minus = "минус";
+            Sep = " ";
+            Digits = new[,]
             {
                 {"ноль", "одно", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"},
                 {"ноль", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"},
@@ -124,15 +125,15 @@ namespace SPEllex.Words.NumberToWords
                 int num3 = int.Parse(num[0].ToString());
                 if (num3 != 0)
                 {
-                    str = _hundreds[num3];
+                    str = Hundreds[num3];
                     if (num.Substring(1) != "00")
                     {
-                        str = str + _sep;
+                        str = str + Sep;
                     }
                     curcase = 3;
                 }
-                int num4 = int.Parse(num[1].ToString());
-                int num5 = int.Parse(num[2].ToString());
+                int num4 = int.Parse(num[1].ToString(CultureInfo.InvariantCulture));
+                int num5 = int.Parse(num[2].ToString(CultureInfo.InvariantCulture));
                 if ((num4 != 0) || (num5 != 0))
                 {
                     if ((num4 == 1) && (num5 == 0))
@@ -141,15 +142,15 @@ namespace SPEllex.Words.NumberToWords
                     }
                     if (num4 == 1)
                     {
-                        return (str + _teens[num5 + 10]);
+                        return (str + Teens[num5 + 10]);
                     }
                     if (num4 > 0)
                     {
-                        str = str + _tens[num4];
+                        str = str + Tens[num4];
                     }
                     if (num5 > 0)
                     {
-                        str = str.TrimEnd(_sep.ToArray()) + _sep + _digits[gender, num5];
+                        str = str.TrimEnd(Sep.ToArray()) + Sep + Digits[gender, num5];
                     }
                     if (num5 == 1)
                     {
@@ -165,7 +166,7 @@ namespace SPEllex.Words.NumberToWords
                 }
                 return str;
             }
-            str = _digits[gender, num2];
+            str = Digits[gender, num2];
             if (num2 == 1)
             {
                 curcase = 1;
@@ -188,7 +189,7 @@ namespace SPEllex.Words.NumberToWords
             string str2 = "";
             if (num[0] == '-')
             {
-                str2 = _minus + _sep;
+                str2 = Minus + Sep;
                 num = num.Substring(1);
             }
             while ((num.Length%3) != 0)
@@ -222,19 +223,19 @@ namespace SPEllex.Words.NumberToWords
                             switch (num4)
                             {
                                 case 1:
-                                    str3 = str3 + _sep + "тысяча";
+                                    str3 = str3 + Sep + "тысяча";
                                     goto Label_015E;
 
                                 case 2:
-                                    str3 = str3 + _sep + "тысячи";
+                                    str3 = str3 + Sep + "тысячи";
                                     goto Label_015E;
                             }
-                            str3 = str3 + _sep + "тысяч";
+                            str3 = str3 + Sep + "тысяч";
                             goto Label_015E;
                     }
-                    if ((!string.IsNullOrEmpty(str3) && (i > 3)) && _exponent.ContainsKey(i))
+                    if ((!string.IsNullOrEmpty(str3) && (i > 3)) && Exponent.ContainsKey(i))
                     {
-                        str3 = str3 + _sep + _exponent[i];
+                        str3 = str3 + Sep + Exponent[i];
                         switch (num4)
                         {
                             case 2:
@@ -249,13 +250,13 @@ namespace SPEllex.Words.NumberToWords
                     Label_015E:
                     if (!string.IsNullOrEmpty(str3))
                     {
-                        str = str3 + _sep + str;
+                        str = str3 + Sep + str;
                     }
                 }
             }
             else
             {
-                str = str + _digits[gender, 0];
+                str = str + Digits[gender, 0];
             }
             return (str2 + str);
         }

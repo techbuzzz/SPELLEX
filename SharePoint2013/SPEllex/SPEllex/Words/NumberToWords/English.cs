@@ -5,10 +5,10 @@ namespace SPEllex.Words.NumberToWords
 {
     internal class English : INumberToWords
     {
-        private static readonly string[] _digits;
-        private static readonly Dictionary<int, string> _exponent;
-        private static readonly string _minus = "minus";
-        private static readonly string _sep;
+        private const string Minus = "minus";
+        private static readonly string[] Digits;
+        private static readonly Dictionary<int, string> Exponent;
+        private static readonly string Sep;
 
         static English()
         {
@@ -49,9 +49,9 @@ namespace SPEllex.Words.NumberToWords
                 {0x60, "untrigintillion"},
                 {0x63, "duotrigintillion"}
             };
-            _exponent = dictionary;
-            _digits = new[] {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
-            _sep = " ";
+            Exponent = dictionary;
+            Digits = new[] {"zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"};
+            Sep = " ";
         }
 
         public string ToWords(string number)
@@ -65,7 +65,7 @@ namespace SPEllex.Words.NumberToWords
             number = number.Trim();
             if (number[0] == '-')
             {
-                str = _sep + _minus;
+                str = Sep + Minus;
                 number = number.Substring(1);
             }
             number = number.TrimStart(new[] {'0'});
@@ -75,15 +75,15 @@ namespace SPEllex.Words.NumberToWords
                 int num2 = num;
                 for (int i = num; i > 0; i--)
                 {
-                    if (_exponent.ContainsKey(i))
+                    if (Exponent.ContainsKey(i))
                     {
                         string str2 = number.Substring(num - num2, (num2 - i) + 1).TrimStart(new[] {'0'});
                         if (!string.IsNullOrEmpty(str2))
                         {
-                            string str3 = _exponent[power];
+                            string str3 = Exponent[power];
                             if (!string.IsNullOrEmpty(powsuffix))
                             {
-                                str3 = _sep + powsuffix;
+                                str3 = Sep + powsuffix;
                             }
                             str = str + ToWords(str2, i, str3);
                         }
@@ -98,7 +98,7 @@ namespace SPEllex.Words.NumberToWords
             }
             else if (string.IsNullOrEmpty(number))
             {
-                return (_sep + _digits[0]);
+                return (Sep + Digits[0]);
             }
             int index = 0;
             int num5 = 0;
@@ -128,7 +128,7 @@ namespace SPEllex.Words.NumberToWords
             if (index != 0)
             {
                 string str4 = str;
-                str = str4 + _sep + _digits[index] + _sep + "hundred";
+                str = str4 + Sep + Digits[index] + Sep + "hundred";
             }
             switch (num5)
             {
@@ -136,86 +136,86 @@ namespace SPEllex.Words.NumberToWords
                     switch (num6)
                     {
                         case 0:
-                            str = str + _sep + "ten";
+                            str = str + Sep + "ten";
                             break;
 
                         case 1:
-                            str = str + _sep + "eleven";
+                            str = str + Sep + "eleven";
                             break;
 
                         case 2:
-                            str = str + _sep + "twelve";
+                            str = str + Sep + "twelve";
                             break;
 
                         case 3:
-                            str = str + _sep + "thirteen";
+                            str = str + Sep + "thirteen";
                             break;
 
                         case 4:
                         case 6:
                         case 7:
                         case 9:
-                            str = str + _sep + _digits[num6] + "teen";
+                            str = str + Sep + Digits[num6] + "teen";
                             break;
 
                         case 5:
-                            str = str + _sep + "fifteen";
+                            str = str + Sep + "fifteen";
                             break;
 
                         case 8:
-                            str = str + _sep + "eighteen";
+                            str = str + Sep + "eighteen";
                             break;
                     }
                     break;
 
                 case 2:
-                    str = str + _sep + "twenty";
+                    str = str + Sep + "twenty";
                     break;
 
                 case 3:
-                    str = str + _sep + "thirty";
+                    str = str + Sep + "thirty";
                     break;
 
                 case 4:
-                    str = str + _sep + "forty";
+                    str = str + Sep + "forty";
                     break;
 
                 case 5:
-                    str = str + _sep + "fifty";
+                    str = str + Sep + "fifty";
                     break;
 
                 case 6:
                 case 7:
                 case 9:
-                    str = str + _sep + _digits[num5] + "ty";
+                    str = str + Sep + Digits[num5] + "ty";
                     break;
 
                 case 8:
-                    str = str + _sep + "eighty";
+                    str = str + Sep + "eighty";
                     break;
             }
             if ((num5 != 1) && (num6 > 0))
             {
                 if (num5 > 1)
                 {
-                    str = str + "-" + _digits[num6];
+                    str = str + "-" + Digits[num6];
                 }
                 else
                 {
-                    str = str + _sep + _digits[num6];
+                    str = str + Sep + Digits[num6];
                 }
             }
             if (power > 0)
             {
-                if (!_exponent.ContainsKey(power))
+                if (!Exponent.ContainsKey(power))
                 {
                     return null;
                 }
-                str = str + _sep + _exponent[power];
+                str = str + Sep + Exponent[power];
             }
             if (!string.IsNullOrEmpty(powsuffix))
             {
-                str = str + _sep + powsuffix;
+                str = str + Sep + powsuffix;
             }
             return str;
         }

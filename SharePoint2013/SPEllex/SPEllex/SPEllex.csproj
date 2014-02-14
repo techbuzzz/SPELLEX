@@ -51,10 +51,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exceptions\FileLockedException.cs" />
+    <Compile Include="Generic\DictionaryExtention.cs" />
     <Compile Include="Office\OpenXmlExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\ServerExtension.cs" />
+    <Compile Include="SharePoint\ContentTypeExtension.cs" />
+    <Compile Include="SharePoint\FarmExtension.cs" />
+    <Compile Include="SharePoint\FieldCollectionExtenstion.cs" />
+    <Compile Include="SharePoint\FieldExtension.cs" />
     <Compile Include="SharePoint\FileExtension.cs" />
     <Compile Include="IO\StreamExtension.cs" />
+    <Compile Include="SharePoint\ListCollectionExtension.cs" />
+    <Compile Include="SharePoint\ListExtension.cs" />
+    <Compile Include="SharePoint\SharePointVersions.cs" />
+    <Compile Include="SharePoint\WebExtension.cs" />
+    <Compile Include="SharePoint\WebList.cs" />
     <Compile Include="Words\NumberToWords\English.cs" />
     <Compile Include="Words\NumberToWords\French.cs" />
     <Compile Include="Words\NumberToWords\German.cs" />
@@ -63,6 +74,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Core\" />
+    <Folder Include="SharePoint\Utils\" />
+    <Folder Include="Web\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="key.snk" />
