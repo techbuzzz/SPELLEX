@@ -8,7 +8,7 @@ namespace SPEllex.SharePoint
         public static SPForm GetForm(this SPList list, PAGETYPE pageType)
         {
             SPForm form = null;
-            var enumerator = list.Forms.GetEnumerator();
+            IEnumerator enumerator = list.Forms.GetEnumerator();
             SPForm current;
             while (enumerator.MoveNext())
             {

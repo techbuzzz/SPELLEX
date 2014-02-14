@@ -12,7 +12,7 @@ namespace SPEllex.SharePoint
             {
                 throw new ArgumentNullException("id");
             }
-            var typedEnumerator = lists.GetTypedEnumerator<SPList>();
+            IEnumerator<SPList> typedEnumerator = lists.GetTypedEnumerator<SPList>();
             while (typedEnumerator.MoveNext())
             {
                 if (typedEnumerator.Current.ID == id)
@@ -29,7 +29,7 @@ namespace SPEllex.SharePoint
             {
                 throw new ArgumentNullException("title");
             }
-            var typedEnumerator = lists.GetTypedEnumerator<SPList>();
+            IEnumerator<SPList> typedEnumerator = lists.GetTypedEnumerator<SPList>();
             while (typedEnumerator.MoveNext())
             {
                 if (typedEnumerator.Current.Title == title)
