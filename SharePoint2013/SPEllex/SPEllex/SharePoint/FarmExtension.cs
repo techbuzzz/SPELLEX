@@ -75,11 +75,9 @@ namespace SPEllex.SharePoint
             {
                 SPContext.Current.Web.AllowUnsafeUpdates = true;
             }
-            if (farm.ExistProperty(key))
-            {
-                farm.Properties.Remove(key);
-                farm.Update();
-            }
+            if (!farm.ExistProperty(key)) return;
+            farm.Properties.Remove(key);
+            farm.Update();
         }
 
         public static void SetProperty(this SPFarm farm, string key, object value)

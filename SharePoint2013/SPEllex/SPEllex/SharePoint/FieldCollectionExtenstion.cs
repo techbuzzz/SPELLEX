@@ -16,8 +16,8 @@ namespace SPEllex.SharePoint
             while (enumerator.MoveNext())
             {
                 current = (SPField) enumerator.Current;
-                string valueForUICulture = current.TitleResource.GetValueForUICulture(cultureInfo);
-                if (title.Equals(valueForUICulture, StringComparison.OrdinalIgnoreCase))
+                string valueForUiCulture = current.TitleResource.GetValueForUICulture(cultureInfo);
+                if (title.Equals(valueForUiCulture, StringComparison.OrdinalIgnoreCase))
                 {
                     goto Success;
                 }

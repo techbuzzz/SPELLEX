@@ -65,6 +65,7 @@
     <Compile Include="SharePoint\ListCollectionExtension.cs" />
     <Compile Include="SharePoint\ListExtension.cs" />
     <Compile Include="SharePoint\SharePointVersions.cs" />
+    <Compile Include="SharePoint\Utils\CustomJob.cs" />
     <Compile Include="SharePoint\Utils\Rights.cs" />
     <Compile Include="SharePoint\WebExtension.cs" />
     <Compile Include="SharePoint\WebList.cs" />

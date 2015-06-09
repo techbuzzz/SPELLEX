@@ -22,11 +22,7 @@ namespace SPEllex.SharePoint
         private static bool Check(SPContentTypeId id, string baseIdString)
         {
             var id2 = new SPContentTypeId(baseIdString);
-            if (!(id == id2))
-            {
-                return id.IsChildOf(id2);
-            }
-            return true;
+            return id == id2 || id.IsChildOf(id2);
         }
     }
 }
