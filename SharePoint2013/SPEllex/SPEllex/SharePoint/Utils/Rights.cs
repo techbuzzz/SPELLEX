@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.SharePoint;
 
 namespace SPEllex.SharePoint.Utils
@@ -63,7 +64,7 @@ namespace SPEllex.SharePoint.Utils
             }
             else
             {
-                int num = 0x3fffffff;
+                const int num = 0x3fffffff;
                 int num2 = (web.AssociatedOwnerGroup != null) ? web.AssociatedOwnerGroup.ID : -1;
                 for (int i = item.RoleAssignments.Count - 1; i >= 0; i--)
                 {
@@ -168,14 +169,7 @@ namespace SPEllex.SharePoint.Utils
             {
                 return false;
             }
-            foreach (SPRoleDefinition definition in assignmentByPrincipal.RoleDefinitionBindings)
-            {
-                if ((definition.BasePermissions & permissions) == permissions)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return assignmentByPrincipal.RoleDefinitionBindings.Cast<SPRoleDefinition>().Any(definition => (definition.BasePermissions & permissions) == permissions);
         }
 
         public static SPRoleDefinition GetRoleDefinition(SPWeb web, string name)
@@ -183,10 +177,9 @@ namespace SPEllex.SharePoint.Utils
             SPRoleDefinitionCollection roleDefinitions = web.RoleDefinitions;
             IEnumerator enumerator = roleDefinitions.GetEnumerator();
 
-            SPRoleDefinition current;
             while (enumerator.MoveNext())
             {
-                current = (SPRoleDefinition) enumerator.Current;
+                SPRoleDefinition current = (SPRoleDefinition) enumerator.Current;
                 if (current.Name == name)
                 {
                     return current;
@@ -204,48 +197,7 @@ namespace SPEllex.SharePoint.Utils
                 toItem.RoleAssignments.Add(right);
             }
         }
-
-
-        public static void RepeatClearRights(SPWeb web, SPListItem item)
-        {
-            RepeatClearRights(web, item, true);
-        }
-
-        public static void RepeatClearRights(SPWeb web, SPListItem item, bool deleteGuest)
-        {
-            // This item is obfuscated and can not be translated.
-            bool allowUnsafeUpdates = web.AllowUnsafeUpdates;
-            bool flag2 = false;
-            int num = 0;
-            while (flag2)
-            {
-                Label_000E:
-                if (!flag2)
-                {
-                    try
-                    {
-                        ClearRights(web, item, deleteGuest);
-                    }
-                    catch (Exception)
-                    {
-                    }
-                }
-                web.AllowUnsafeUpdates = allowUnsafeUpdates;
-                return;
-
-                try
-                {
-                    num++;
-                    ClearRights(web, item, deleteGuest);
-                    flag2 = true;
-                }
-                catch (Exception)
-                {
-                }
-                goto Label_000E;
-            }
-        }
-
+        
         public static void SetReadOnly(SPListItem item)
         {
             SPWeb web = item.Web;
@@ -310,34 +262,32 @@ namespace SPEllex.SharePoint.Utils
 
         public static void AssignRights(SPWeb web, SPFolder folder, object user, string role)
         {
-            if (user != null)
+            if (user == null) return;
+            bool allowUnsafeUpdates = web.AllowUnsafeUpdates;
+            web.AllowUnsafeUpdates = true;
+            SPRoleDefinition roleDefinition = GetRoleDefinition(web, role);
+            if (user is string)
             {
-                bool allowUnsafeUpdates = web.AllowUnsafeUpdates;
-                web.AllowUnsafeUpdates = true;
-                SPRoleDefinition roleDefinition = GetRoleDefinition(web, role);
-                if (user is string)
-                {
-                    var value2 = new SPFieldUserValue(web, (string) user);
-                    AssignRights(web, value2, roleDefinition, folder);
-                }
-                else if (user is SPFieldUserValueCollection)
-                {
-                    AssignRights(web, (SPFieldUserValueCollection) user, roleDefinition, folder);
-                }
-                else if (user is SPFieldUserValue)
-                {
-                    AssignRights(web, (SPFieldUserValue) user, roleDefinition, folder);
-                }
-                else if (user is SPPrincipal)
-                {
-                    AssignRights(web, (SPPrincipal) user, roleDefinition, folder);
-                }
-                else if (user is List<SPPrincipal>)
-                {
-                    AssignRights(web, (List<SPPrincipal>) user, roleDefinition, folder);
-                }
-                web.AllowUnsafeUpdates = allowUnsafeUpdates;
+                var value2 = new SPFieldUserValue(web, (string) user);
+                AssignRights(web, value2, roleDefinition, folder);
             }
+            else if (user is SPFieldUserValueCollection)
+            {
+                AssignRights(web, (SPFieldUserValueCollection) user, roleDefinition, folder);
+            }
+            else if (user is SPFieldUserValue)
+            {
+                AssignRights(web, (SPFieldUserValue) user, roleDefinition, folder);
+            }
+            else if (user is SPPrincipal)
+            {
+                AssignRights(web, (SPPrincipal) user, roleDefinition, folder);
+            }
+            else if (user is List<SPPrincipal>)
+            {
+                AssignRights(web, (List<SPPrincipal>) user, roleDefinition, folder);
+            }
+            web.AllowUnsafeUpdates = allowUnsafeUpdates;
         }
 
         public static void AssignTravelingRights(SPWeb web, Dictionary<SPUser, SPRoleDefinition> users, SPListItem item)
@@ -379,16 +329,14 @@ namespace SPEllex.SharePoint.Utils
         private static void AssignRights(SPWeb web, SPPrincipal principal, SPRoleDefinition roleDefinition,
             SPListItem item)
         {
-            if (!DoesPrincipalHasPermissions(item, principal, roleDefinition.BasePermissions))
+            if (DoesPrincipalHasPermissions(item, principal, roleDefinition.BasePermissions)) return;
+            if (!item.HasUniqueRoleAssignments)
             {
-                if (!item.HasUniqueRoleAssignments)
-                {
-                    item.BreakRoleInheritance(true);
-                }
-                var roleAssignment = new SPRoleAssignment(principal);
-                roleAssignment.RoleDefinitionBindings.Add(roleDefinition);
-                item.RoleAssignments.Add(roleAssignment);
+                item.BreakRoleInheritance(true);
             }
+            var roleAssignment = new SPRoleAssignment(principal);
+            roleAssignment.RoleDefinitionBindings.Add(roleDefinition);
+            item.RoleAssignments.Add(roleAssignment);
         }
 
         private static void AssignRights(SPWeb web, List<SPPrincipal> principals, SPRoleDefinition roleDefinition,
@@ -433,16 +381,14 @@ namespace SPEllex.SharePoint.Utils
         private static void AssignRights(SPWeb web, SPPrincipal principal, SPRoleDefinition roleDefinition,
             SPFolder folder)
         {
-            if (!DoesPrincipalHasPermissions(folder, principal, roleDefinition.BasePermissions))
+            if (DoesPrincipalHasPermissions(folder, principal, roleDefinition.BasePermissions)) return;
+            if (!folder.Item.HasUniqueRoleAssignments)
             {
-                if (!folder.Item.HasUniqueRoleAssignments)
-                {
-                    folder.Item.BreakRoleInheritance(true);
-                }
-                var roleAssignment = new SPRoleAssignment(principal);
-                roleAssignment.RoleDefinitionBindings.Add(roleDefinition);
-                folder.Item.RoleAssignments.Add(roleAssignment);
+                folder.Item.BreakRoleInheritance(true);
             }
+            var roleAssignment = new SPRoleAssignment(principal);
+            roleAssignment.RoleDefinitionBindings.Add(roleDefinition);
+            folder.Item.RoleAssignments.Add(roleAssignment);
         }
 
         private static bool DoesPrincipalHasPermissions(SPFolder folder, SPPrincipal principal,
@@ -462,14 +408,7 @@ namespace SPEllex.SharePoint.Utils
             {
                 return false;
             }
-            foreach (SPRoleDefinition definition in assignmentByPrincipal.RoleDefinitionBindings)
-            {
-                if ((definition.BasePermissions & permissions) == permissions)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return assignmentByPrincipal.RoleDefinitionBindings.Cast<SPRoleDefinition>().Any(definition => (definition.BasePermissions & permissions) == permissions);
         }
 
         private static void AssignRights(SPWeb web, SPFieldUserValueCollection users, SPRoleDefinition roleDefinition,
